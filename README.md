@@ -20,3 +20,18 @@ Tested on Ubuntu 18.
     cd boardfarm_server_api/
     npm install
     ```
+1. You need a mongodb to store data. Specify the username and password as environment variables:
+    ```sh
+    export MONGO_USER="myuser"
+    export MONGO_PASS="mypass"
+    ```
+    Then specify the mongodb connetion uri in the file `config.js`:
+    ```js
+    var user = process.env.MONGO_USER
+    var pass = process.env.MONGO_PASS
+    module.exports.mongodb_uri = `mongodb+srv://${user}:${pass}@boardfarm0-mgbyp.mongodb.net/test?retryWrites=true&w=majority`
+    ```
+1. Now start the server:
+    ```sh
+    node index.js
+    ```
