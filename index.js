@@ -10,6 +10,7 @@ app.use(bodyParser.json())
 
 var router = require('./api/router')
 
+// Start all router paths with /api
 app.use('/api', router)
 
 // Start Server
