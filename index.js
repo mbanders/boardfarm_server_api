@@ -1,5 +1,6 @@
 
-var port = 80
+const config = require('./config')
+
 const express = require('express')
 const app = express()
 const bodyParser = require('body-parser')
@@ -16,5 +17,5 @@ router.get('/', function (req, res) {
 app.use('/api', router)
 
 // Start Server
-app.listen(port)
-console.log('Server is listening on port ' + port)
+app.listen(config.port)
+console.log('Server is listening on port ' + config.port)
