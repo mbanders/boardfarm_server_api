@@ -8,11 +8,7 @@ const bodyParser = require('body-parser')
 app.use(bodyParser.urlencoded({ extended: true }))
 app.use(bodyParser.json())
 
-var router = express.Router()
-
-router.get('/', function (req, res) {
-  res.json({ message: 'Hello' })
-})
+var router = require('./api/router')
 
 app.use('/api', router)
 
