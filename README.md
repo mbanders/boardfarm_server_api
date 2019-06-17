@@ -35,3 +35,23 @@ Tested on Ubuntu 18.
     ```sh
     node index.js
     ```
+1. Open a web browser and visit `http://YourServer/api` (replace "YourServer" with the IP address or hostname of your server)  and you should see a message saying "Welcome".
+
+## Put full boardfarm config file into MongoDb
+
+1. Specify your username and password to connect to mongodb:
+    ```sh
+    export MONGO_USER="myuser"
+    export MONGO_PASS="mypass"
+    ```
+    See `config.js` to change the `mongodb_uri` if needed.
+1. Copy your boardfarm config file:
+    ```sh
+    cd boardfarm_server_api/scripts/
+    cp bf_config.json .
+    ```
+1. Now you can insert your config to mongodb:
+    ```sh
+    ./push_config.js bf_config.json
+    ```
+1. Start your server (see "Quickstart" section above) and you can visit `http://YourServer/api/bf_config` to see the boardfarm config file you just pushed.
