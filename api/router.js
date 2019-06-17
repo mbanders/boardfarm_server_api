@@ -2,9 +2,11 @@ const express = require('express')
 var router = express.Router()
 
 const database = require('./database')
+const api_version = require('../package.json').version
 
 router.get('/', (req, res) => {
-  res.json({ message: 'Welcome to Boardfarm REST API' })
+  res.json({ message: 'Welcome to Boardfarm REST API',
+	     version: api_version })
 })
 
 router.get('/devices', (req, res) => {
