@@ -6,7 +6,8 @@ const client = new mongodb.MongoClient(config.mongodb_uri, { useNewUrlParser: tr
 const db_name = 'boardfarm'
 
 module.exports = {
-  'devices': null
+  'devices': null,
+  'bf_config': null
 }
 
 module.exports.sanitize = function (data) {
@@ -24,6 +25,7 @@ client.connect(err => {
   }
   console.log('Connected to MongoDB')
   module.exports.devices = client.db(db_name).collection('devices')
+  module.exports.bf_config = client.db(db_name).collection('bf_config')
 })
 
 process.on('SIGINT', () => {

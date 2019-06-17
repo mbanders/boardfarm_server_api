@@ -13,6 +13,12 @@ router.get('/devices', (req, res) => {
   })
 })
 
+router.get('/bf_config', (req, res) => {
+  database.bf_config.findOne({}, (err, doc) => {
+    res.json(doc)
+  })
+})
+
 router.post('/checkout', (req, res) => {
   console.log('Request to checkout a device matching')
   req.body['inUse'] = false
