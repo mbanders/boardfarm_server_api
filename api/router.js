@@ -15,6 +15,7 @@ router.get('/devices', (req, res) => {
 
 router.get('/bf_config', (req, res) => {
   database.bf_config.findOne({}, (err, doc) => {
+    delete doc._id
     res.json(doc)
   })
 })
