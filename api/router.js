@@ -23,8 +23,11 @@ router.get('/bf_config', (req, res) => {
 })
 
 router.post('/checkout', (req, res) => {
-  console.log('Request to checkout a device matching')
-  req.body['inUse'] = false
+  console.log('Request from %s to checkout: %s', req.connection.remoteAddress, req.body.name)
+  req.body.timestamp = new Date().toISOString()
+  console.log(req.body)
+  res.json({"message": "OK"})
+  /*req.body['inUse'] = false
   console.log(req.body)
   database.devices.findOneAndUpdate(req.body, { $set: { inUse: true } }, {}, (err, doc) => {
     if (err) {
@@ -32,12 +35,15 @@ router.post('/checkout', (req, res) => {
     } else {
       res.json(doc)
     }
-  })
+  })*/
 })
 
 router.post('/checkin', (req, res) => {
-  console.log('Request to checkin device')
-  req.body = database.sanitize(req.body)
+  console.log('Request from %s to checkin: %s', req.connection.remoteAddress, req.body.name)
+  req.body.timestamp = new Date().toISOString()
+  console.log(req.body)
+  res.json({"message": "OK"})
+  /*req.body = database.sanitize(req.body)
   console.log(req.body)
   database.devices.findOneAndUpdate(req.body, { $set: { inUse: false } }, {}, (err, doc) => {
     if (err) {
@@ -45,7 +51,7 @@ router.post('/checkin', (req, res) => {
     } else {
       res.json(doc)
     }
-  })
+  })*/
 })
 
 module.exports = router
