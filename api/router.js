@@ -15,10 +15,56 @@ router.get('/devices', (req, res) => {
   })
 })
 
+router.get('/locations', (req, res) => {
+  database.location.find({}).toArray((err, docs) => {
+    res.json(docs)
+  })
+})
+
+router.get('/stations', (req, res) => {
+  database.station.find({}).toArray((err, docs) => {
+    res.json(docs)
+  })
+})
+
 router.get('/bf_config', (req, res) => {
   database.bf_config.findOne({}, (err, doc) => {
     delete doc._id
     res.json(doc)
+  })
+})
+
+router.get('/bf_config_new', (req, res) => {
+  var final_config = {}
+  // Add locations
+  database.location.find({}).toArray( (err, docs) => {
+    if (err) {
+      throw err
+    }
+
+    final_config.locations = {}
+    docs.forEach( (doc) => {
+      let name = doc.name
+      delete doc._id
+      delete doc.name
+      final_config.locations[name] = doc
+    })
+    
+    // Add stations
+    database.station.find({}).toArray( (err, docs) => {
+      if (err) {
+	throw err
+      }
+
+      docs.forEach( (doc) => {
+	let name = doc.name
+	delete doc._id
+	delete doc.name
+	final_config[name] = doc
+      })
+      // Send result
+      res.json(final_config)
+    })
   })
 })
 

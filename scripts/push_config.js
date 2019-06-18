@@ -25,8 +25,47 @@ client.connect(err => {
     process.exit(1)
   }
   console.log('Connected to MongoDB')
-  collection = client.db(db_name).collection('bf_config')
-  collection.insertOne(bf_config, (err, res) => {
+
+  // Collections to insert to
+  station_coll = client.db(db_name).collection('station')
+  location_coll = client.db(db_name).collection('location')
+
+  // Array of documents we will insert
+  stations_to_insert = []
+  locations_to_insert = []
+
+  console.log(Object.keys(bf_config))
+  if ("locations" in bf_config) {
+    var entries = Object.entries(bf_config.locations)
+    for (const [key, val] of entries) {
+      val.name = key
+      locations_to_insert.push(val)
+    }
+    delete bf_config.locations
+
+    /*location_coll.insertMany(locations_to_insert, (err, res) => {
+      if (err) {
+	throw err
+      }
+      console.log("Inserted %s locations.", locations_to_insert.length)
+    })*/
+  }
+
+  var entries = Object.entries(bf_config)
+  for (const [key, val] of entries) {
+    val.name = key
+    stations_to_insert.push(val)
+  }
+  station_coll.insertMany(stations_to_insert, (err, res) => {
+    if (err) {
+      throw err
+    }
+    console.log("Inserted %s stations.", stations_to_insert.length)
+  })
+
+  console.log("Closing connection ...")
+  client.close()
+  /*collection.insertOne(bf_config, (err, res) => {
     if (err) {
       console.log(err)
       console.log('Error inserting config into MongoDB')
@@ -34,5 +73,5 @@ client.connect(err => {
     }
     console.log('Inserted %s into MongodDB', bf_config_name)
     client.close()
-  })
+  })*/
 })
