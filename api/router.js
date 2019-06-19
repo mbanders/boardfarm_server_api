@@ -36,7 +36,8 @@ router.get('/bf_config', (req, res) => {
 
 router.get('/bf_config_new', (req, res) => {
   // Only return stations matching this filter
-  const station_filter = {"active_users": 0, "available_for_autotests": true}
+  const station_filter = {"active_users": {$in: [null, 0]},
+			  "available_for_autotests": true}
   // Final config that will be returned
   var final_config = {}
   // Add locations
