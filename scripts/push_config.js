@@ -54,6 +54,7 @@ client.connect(err => {
   var entries = Object.entries(bf_config)
   for (const [key, val] of entries) {
     val.name = key
+    val.active_users = 0
     stations_to_insert.push(val)
   }
   station_coll.insertMany(stations_to_insert, (err, res) => {
