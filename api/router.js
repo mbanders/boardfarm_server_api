@@ -35,6 +35,9 @@ router.get('/bf_config', (req, res) => {
 })
 
 router.get('/bf_config_new', (req, res) => {
+  // Only return stations matching this filter
+  const station_filter = {"active_users": 0, "available_for_autotests": true}
+  // Final config that will be returned
   var final_config = {}
   // Add locations
   database.location.find({}).toArray( (err, docs) => {
@@ -51,7 +54,7 @@ router.get('/bf_config_new', (req, res) => {
     })
     
     // Add stations
-    database.station.find({}).toArray( (err, docs) => {
+    database.station.find(station_filter).toArray( (err, docs) => {
       if (err) {
 	throw err
       }
@@ -72,32 +75,28 @@ router.post('/checkout', (req, res) => {
   console.log('Request from %s to checkout: %s', req.connection.remoteAddress, req.body.name)
   req.body.timestamp = new Date().toISOString()
   console.log(req.body)
-  res.json({"message": "OK"})
-  /*req.body['inUse'] = false
-  console.log(req.body)
-  database.devices.findOneAndUpdate(req.body, { $set: { inUse: true } }, {}, (err, doc) => {
+  var filter = {"name": req.body.name}
+  database.station.findOneAndUpdate(filter, { $inc: {"active_users" : 1 } }, {}, (err, doc) => {
     if (err) {
       res.json({ 'status': 'fail' })
     } else {
       res.json(doc)
     }
-  })*/
+  })
 })
 
 router.post('/checkin', (req, res) => {
   console.log('Request from %s to checkin: %s', req.connection.remoteAddress, req.body.name)
   req.body.timestamp = new Date().toISOString()
   console.log(req.body)
-  res.json({"message": "OK"})
-  /*req.body = database.sanitize(req.body)
-  console.log(req.body)
-  database.devices.findOneAndUpdate(req.body, { $set: { inUse: false } }, {}, (err, doc) => {
+  var filter = {"name": req.body.name}
+  database.station.findOneAndUpdate(filter, { $inc: {"active_users" : -1 } }, {}, (err, doc) => {
     if (err) {
       res.json({ 'status': 'fail' })
     } else {
       res.json(doc)
     }
-  })*/
+  })
 })
 
 module.exports = router
