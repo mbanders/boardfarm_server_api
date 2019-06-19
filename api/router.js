@@ -21,11 +21,25 @@ router.get('/locations', (req, res) => {
   })
 })
 
+router.get('/locations/:name', (req, res) => {
+  database.location.findOne({"name":req.params.name}, (err, docs) => {
+    res.json(docs)
+  })
+})
+
+
 router.get('/stations', (req, res) => {
   database.station.find({}).toArray((err, docs) => {
     res.json(docs)
   })
 })
+
+router.get('/stations/:name', (req, res) => {
+  database.station.findOne({"name":req.params.name}, (err, docs) => {
+    res.json(docs)
+  })
+})
+
 
 router.get('/bf_config', (req, res) => {
   database.bf_config.findOne({}, (err, doc) => {
