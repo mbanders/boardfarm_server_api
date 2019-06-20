@@ -5,4 +5,5 @@ module.exports = {
 // For connecting to MongoDB
 var user = process.env.MONGO_USER
 var pass = process.env.MONGO_PASS
-module.exports.mongodb_uri = `mongodb+srv://${user}:${pass}@boardfarm0-mgbyp.mongodb.net/test?retryWrites=true&w=majority`
+var srv = process.env.MONGO_SERVER
+module.exports.mongodb_uri = `mongodb+srv://${user}:${pass}@${srv}/test?retryWrites=true&w=majority`
