@@ -55,3 +55,15 @@ Tested on Ubuntu 18.
     ./push_config.js bf_config.json
     ```
 1. Start your server (see "Quickstart" section above) and you can visit `http://YourServer/api/bf_config` to see the boardfarm config file you just pushed.
+
+### Running in docker container
+
+    docker run -d -e MONGO_INITDB_ROOT_USERNAME=$adminuser \
+        -e MONGO_INITDB_ROOT_PASSWORD=$adminpass -p 27017:27017 \
+        --name mongodb mongo:latest
+    docker exec -it mongodb mongo -u $adminuser -p $adminpass \
+         --eval "db.createUser({ user:'$bftuser', pwd:'$bftpass', roles:[ { role:'readWrite', db:'test' } ], mechanisms:[ 'SCRAM-SHA-1' ] })"
+    docker build -t bft:server_api .
+    docker run -e MONGO_USER=$bftuser \
+        -e MONGO_PASS=$bftpass -e MONGO_SERVER=$mongodbserver \
+        -p 80:80 bft:server_api
