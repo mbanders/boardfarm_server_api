@@ -40,6 +40,18 @@ router.get('/stations/:name', (req, res) => {
   })
 })
 
+router.post('/stations/:name', (req, res) => {
+  var filter = {"name": req.params.name}
+  var action = { $set: req.body }
+  database.station.findOneAndUpdate(filter, action, {}, (err, doc) => {
+    if (err) {
+      res.json({ 'status': 'fail' })
+    } else {
+      res.json(doc)
+    }
+  })
+})
+
 
 router.get('/bf_config', (req, res) => {
   database.bf_config.findOne({}, (err, doc) => {
