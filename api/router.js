@@ -91,7 +91,12 @@ router.post('/checkout', (req, res) => {
   req.body.timestamp = new Date().toISOString()
   console.log(req.body)
   var filter = {"name": req.body.name}
-  database.station.findOneAndUpdate(filter, { $inc: {"active_users" : 1 } }, {}, (err, doc) => {
+  var action = { $inc: {"active_users": 1,
+			"total_uses" : 1 },
+		 $set: {"active_user": req.body.username,
+			"active_host": req.body.hostname }
+	       }
+  database.station.findOneAndUpdate(filter, action, {}, (err, doc) => {
     if (err) {
       res.json({ 'status': 'fail' })
     } else {
@@ -105,7 +110,13 @@ router.post('/checkin', (req, res) => {
   req.body.timestamp = new Date().toISOString()
   console.log(req.body)
   var filter = {"name": req.body.name}
-  database.station.findOneAndUpdate(filter, { $inc: {"active_users" : -1 } }, {}, (err, doc) => {
+  var action = { $inc: {"active_users": -1 },
+		 $set: {"active_user": "",
+			"active_host": "",
+			"prev_user": req.body.username,
+			"prev_host": req.body.hostname}
+	       }
+  database.station.findOneAndUpdate(filter, action, {}, (err, doc) => {
     if (err) {
       res.json({ 'status': 'fail' })
     } else {
