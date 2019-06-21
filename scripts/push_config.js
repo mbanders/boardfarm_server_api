@@ -43,18 +43,21 @@ client.connect(err => {
     }
     delete bf_config.locations
 
-    /*location_coll.insertMany(locations_to_insert, (err, res) => {
+    location_coll.insertMany(locations_to_insert, (err, res) => {
       if (err) {
 	throw err
       }
       console.log("Inserted %s locations.", locations_to_insert.length)
-    })*/
+    })
   }
 
   var entries = Object.entries(bf_config)
   for (const [key, val] of entries) {
     val.name = key
     val.active_users = 0
+    val.active_user = ""
+    val.active_host = ""
+    val.total_uses = 0
     stations_to_insert.push(val)
   }
   station_coll.insertMany(stations_to_insert, (err, res) => {
