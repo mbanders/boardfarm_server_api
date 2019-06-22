@@ -52,15 +52,7 @@ router.post('/stations/:name', (req, res) => {
   })
 })
 
-
 router.get('/bf_config', (req, res) => {
-  database.bf_config.findOne({}, (err, doc) => {
-    delete doc._id
-    res.json(doc)
-  })
-})
-
-router.get('/bf_config_new', (req, res) => {
   // Only return stations matching this filter
   const station_filter = {"active_users": {$in: [null, 0]},
 			  "available_for_autotests": true}
