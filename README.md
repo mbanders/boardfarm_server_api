@@ -20,10 +20,11 @@ Tested on Ubuntu 18.
     cd boardfarm_server_api/
     npm install
     ```
-1. You need a mongodb to store data. Specify the username and password as environment variables:
+1. You need a mongodb to store data. Specify the username, password, and server hostname as environment variables:
     ```sh
     export MONGO_USER="myuser"
     export MONGO_PASS="mypass"
+    export MONGO_SERVER="myserver"
     ```
     Then specify the mongodb connetion uri in the file `config.js`:
     ```js
@@ -39,10 +40,11 @@ Tested on Ubuntu 18.
 
 ## Put full boardfarm config file into MongoDb
 
-1. Specify your username and password to connect to mongodb:
+1. Specify your username, password, and server hostname to connect to mongodb:
     ```sh
     export MONGO_USER="myuser"
     export MONGO_PASS="mypass"
+    export MONGO_SERVER="myserver"
     ```
     See `config.js` to change the `mongodb_uri` if needed.
 1. Copy your boardfarm config file:
@@ -55,6 +57,19 @@ Tested on Ubuntu 18.
     ./push_config.js bf_config.json
     ```
 1. Start your server (see "Quickstart" section above) and you can visit `http://YourServer/api/bf_config` to see the boardfarm config file you just pushed.
+
+## Rest API Desciription
+
+All paths begin with `/api`.
+
+| path | Method | Data Parameters | Response |
+|------|--------|-----------------|----------|
+| / | GET    | - | {"message": "Welcome to Boardfarm REST API","version": "X.Y.Z"} |
+| /bf_config | GET | - | A JSON document formatted for for `bft` |
+| /stations | GET | - | A JSON document describing all stations |
+| /stations/\<name\> | GET  | - | A JSON document describing the station with a given name |
+| /stations/\<name\> | POST | JSON containing fields and values to change |                                                                 
+| /locations | GET    | - | A JSON document describing all locations |
 
 ### Running in docker container
 
