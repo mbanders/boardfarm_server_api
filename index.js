@@ -1,4 +1,4 @@
-
+#!/usr/bin/env nodejs
 const config = require('./config')
 
 const express = require('express')
