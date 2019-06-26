@@ -36,7 +36,7 @@ Tested on Ubuntu 18.
     ```sh
     node index.js
     ```
-1. Open a web browser and visit `http://YourServer/api` (replace "YourServer" with the IP address or hostname of your server)  and you should see a message saying "Welcome".
+1. Open a web browser and visit `http://YourServer:Port/api`, be sure to replace "YourServer:Port" with the IP address (or hostname) and port of your server. You should see a message saying "Welcome".
 
 ## Put full boardfarm config file into MongoDb
 
