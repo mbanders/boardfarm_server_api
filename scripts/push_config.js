@@ -19,6 +19,8 @@ function process_config (bf_config_name, callback) {
       if ('devices' in val) {
         val['devices'].forEach(e => {
           e.max_users = 1
+          e.active_users = 0
+          e.available_for_autotests = true
           e.location = key
           devices_to_insert.push(e)
         })
@@ -33,6 +35,7 @@ function process_config (bf_config_name, callback) {
   entries = Object.entries(bf_config)
   for (const [key, val] of entries) {
     val.name = key
+    val.available_for_autotests = true
     val.active_users = 0
     val.active_user = ''
     val.active_host = ''
@@ -73,7 +76,6 @@ function insert_into_mongo (devices_to_insert, locations_to_insert, stations_to_
         throw err
       }
       console.log('Inserted %s devices.', devices_to_insert.length)
-      process.exit(0)
     })
     location_coll.insertMany(locations_to_insert, (err, res) => {
       if (err) {
@@ -86,9 +88,9 @@ function insert_into_mongo (devices_to_insert, locations_to_insert, stations_to_
         throw err
       }
       console.log('Inserted %s stations.', stations_to_insert.length)
+      console.log('Closing connection ...')
+      setTimeout(() => { client.close() }, 1000)
     })
-    console.log('Closing connection ...')
-    setTimeout(client.close, 3000)
   })
 }
 
