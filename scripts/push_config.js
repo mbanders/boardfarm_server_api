@@ -18,7 +18,9 @@ function process_config (bf_config_name, callback) {
       // Put shared devices into their own table
       if ('devices' in val) {
         val['devices'].forEach(e => {
-          e.max_users = 1
+          if (!('max_users' in e)) {
+            e.max_users = 1
+          }
           e.active_users = 0
           e.available_for_autotests = true
           e.location = key
