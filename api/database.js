@@ -6,7 +6,7 @@ const client = new mongodb.MongoClient(config.mongodb_uri, { useNewUrlParser: tr
 const db_name = 'boardfarm'
 
 module.exports = {
-  'devices': null,
+  'device': null,
   'bf_config': null,
   'station': null,
   'location': null
@@ -26,7 +26,7 @@ client.connect(err => {
     process.exit(1)
   }
   console.log('Connected to MongoDB')
-  module.exports.devices = client.db(db_name).collection('devices')
+  module.exports.device = client.db(db_name).collection('device')
   module.exports.bf_config = client.db(db_name).collection('bf_config')
   module.exports.station = client.db(db_name).collection('station')
   module.exports.location = client.db(db_name).collection('location')

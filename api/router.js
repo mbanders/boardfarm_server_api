@@ -10,7 +10,7 @@ router.get('/', (req, res) => {
 })
 
 router.get('/devices', (req, res) => {
-  database.devices.find({}).toArray((err, docs) => {
+  database.device.find({}).toArray((err, docs) => {
     res.json(docs)
   })
 })
