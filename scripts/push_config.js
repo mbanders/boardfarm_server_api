@@ -1,4 +1,4 @@
-#!/usr/bin/env nodejs
+#!/usr/bin/env node
 
 const config = require('../config')
 
@@ -29,19 +29,37 @@ client.connect(err => {
   // Collections to insert to
   station_coll = client.db(db_name).collection('station')
   location_coll = client.db(db_name).collection('location')
+  device_coll = client.db(db_name).collection('device')
 
   // Array of documents we will insert
   stations_to_insert = []
   locations_to_insert = []
+  devices_to_insert = []
 
   console.log(Object.keys(bf_config))
   if ("locations" in bf_config) {
     var entries = Object.entries(bf_config.locations)
     for (const [key, val] of entries) {
+      // Put shared devices into their own table
+      if ("devices" in val) {
+        val["devices"].forEach(e => {
+          e.max_users = 1
+          e.location = key
+          devices_to_insert.push(e)
+        })
+      }
       val.name = key
       locations_to_insert.push(val)
     }
     delete bf_config.locations
+
+    device_coll.insertMany(devices_to_insert, (err, res) => {
+      if (err) {
+        throw err
+      }
+      console.log("Inserted %s devices.", devices_to_insert.length)
+      process.exit(0)
+    })
 
     location_coll.insertMany(locations_to_insert, (err, res) => {
       if (err) {
