@@ -79,7 +79,7 @@ router.post('/bf_config', (req, res) => {
         throw err
       }
       console.log('Inserted %s stations.', stations.length)
-      var msg = `Sucessfully inserted ${devices.length} shared devices, ${locations.length} locations, ${stations.length} stations.`
+      var msg = `Successfully inserted ${devices.length} shared devices, ${locations.length} locations, ${stations.length} stations.`
       res.json({'message': msg})
     })
   })
