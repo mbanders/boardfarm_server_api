@@ -89,10 +89,12 @@ router.get('/bf_config', (req, res) => {
   // Only return stations matching this filter
   const station_filter = { 'active_users': { $in: [null, 0] },
                            'available_for_autotests': true }
+  const device_filter = { $expr: { $gt: ["$max_users", "$active_users"] } }
+  const projection = {'projection': {_id: 0, max_users: 0, active_users: 0}}
   // Final config that will be returned
   var final_config = {}
   // Add locations
-  database.location.find({}).toArray((err, docs) => {
+  database.location.find({}, projection).toArray((err, docs) => {
     if (err) {
       throw err
     }
@@ -101,27 +103,32 @@ router.get('/bf_config', (req, res) => {
     docs.forEach((doc) => {
       doc.devices = []
       let name = doc.name
-      delete doc._id
       delete doc.name
       final_config.locations[name] = doc
     })
 
     // Add devices to their locations
-    database.device.find({}, {'projection': {_id: 0}}).toArray((err, docs) => {
-      docs.forEach((doc) => {
+    database.device.find(device_filter, projection).toArray((err, docs) => {
+      let names = []
+      for (let i = 0; i < docs.length; i++) {
+        let doc = docs[i]
+        // Only show at most 1 device of a given name
+        if (names.includes(doc.name)) {
+          continue
+        }
+        names.push(doc.name)
         final_config.locations[doc.location].devices.push(doc)
-      })
+      }
     })
 
     // Add stations
-    database.station.find(station_filter).toArray((err, docs) => {
+    database.station.find(station_filter, projection).toArray((err, docs) => {
       if (err) {
         throw err
       }
 
       docs.forEach((doc) => {
         let name = doc.name
-        delete doc._id
         delete doc.name
         final_config[name] = doc
       })
