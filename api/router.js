@@ -90,7 +90,7 @@ router.get('/bf_config', (req, res) => {
   const station_filter = { 'active_users': { $in: [null, 0] },
                            'available_for_autotests': true }
   const device_filter = { $expr: { $gt: ["$max_users", "$active_users"] } }
-  const projection = {'projection': {_id: 0, max_users: 0, active_users: 0}}
+  const projection = {'projection': {_id: 0, max_users: 0, active_users: 0, available_for_autotests: 0}}
   // Final config that will be returned
   var final_config = {}
   // Add locations
