@@ -12,13 +12,6 @@ module.exports = {
   'location': null
 }
 
-module.exports.sanitize = function (data) {
-  if ('_id' in data) {
-    data['_id'] = new mongodb.ObjectID(data['_id'])
-  }
-  return data
-}
-
 client.connect(err => {
   if (err) {
     console.log(err)
