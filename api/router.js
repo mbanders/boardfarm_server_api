@@ -62,18 +62,22 @@ router.post('/bf_config', (req, res) => {
     console.log(' * %s devices', devices.length)
     console.log(' * %s locations', locations.length)
     console.log(' * %s stations', stations.length)
-    database.device.insertMany(devices, (err, result) => {
-      if (err) {
-        throw err
-      }
-      console.log('Inserted %s devices.', devices.length)
-    })
-    database.location.insertMany(locations, (err, result) => {
-      if (err) {
-        throw err
-      }
-      console.log('Inserted %s locations.', locations.length)
-    })
+    if (devices.length > 0) {
+      database.device.insertMany(devices, (err, result) => {
+        if (err) {
+          throw err
+        }
+        console.log('Inserted %s devices.', devices.length)
+      })
+    }
+    if (locations.length > 0) {
+      database.location.insertMany(locations, (err, result) => {
+        if (err) {
+          throw err
+        }
+        console.log('Inserted %s locations.', locations.length)
+      })
+    }
     database.station.insertMany(stations, (err, result) => {
       if (err) {
         throw err
@@ -90,7 +94,7 @@ router.get('/bf_config', (req, res) => {
   const station_filter = { 'active_users': { $in: [null, 0] },
                            'available_for_autotests': true }
   const device_filter = { $expr: { $gt: ["$max_users", "$active_users"] } }
-  const projection = {'projection': {_id: 0, max_users: 0, active_users: 0, available_for_autotests: 0}}
+  const projection = {'projection': {max_users: 0, active_users: 0, available_for_autotests: 0}}
   // Final config that will be returned
   var final_config = {}
   // Add locations
@@ -132,6 +136,9 @@ router.get('/bf_config', (req, res) => {
         delete doc.name
         final_config[name] = doc
       })
+      if (Object.keys(final_config.locations).length == 0) {
+        delete final_config.locations
+      }
       // Send result
       res.json(final_config)
     })
