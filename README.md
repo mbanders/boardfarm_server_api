@@ -37,26 +37,15 @@ Tested on Ubuntu 18.
     node index.js
     ```
 1. Open a web browser and visit `http://YourServer:Port/api`, be sure to replace "YourServer:Port" with the IP address (or hostname) and port of your server. You should see a message saying "Welcome".
-
-## Put full boardfarm config file into MongoDb
-
-1. Specify your username, password, and server hostname to connect to mongodb:
+1. Post your boardfarm configuration JSON file so that stations and devices are stored:
     ```sh
-    export MONGO_USER="myuser"
-    export MONGO_PASS="mypass"
-    export MONGO_SERVER="myserver"
+    curl -X POST \
+         -H "Content-Type: application/json" \
+         -d @boardfarm_config_example.json \
+         http://YourServer:Port/api/bf_config
     ```
-    See `config.js` to change the `mongodb_uri` if needed.
-1. Copy your boardfarm config file:
-    ```sh
-    cd boardfarm_server_api/scripts/
-    cp bf_config.json .
-    ```
-1. Now you can insert your config to mongodb:
-    ```sh
-    ./push_config.js bf_config.json
-    ```
-1. Start your server (see "Quickstart" section above) and you can visit `http://YourServer/api/bf_config` to see the boardfarm config file you just pushed.
+1. Visit `http://YourServer:Port/api/bf_config` to see the full boardfarm config file you just pushed. You will see some extra keys, that's ok.
+1. Also visit `http://YourServer:Port/api/stations` and `http://YourServer:port/api/devices` to see the stations and the shareable devices.
 
 ## Rest API Desciription
 
