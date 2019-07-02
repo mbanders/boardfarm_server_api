@@ -1,3 +1,4 @@
+[![Build Status](https://travis-ci.org/mbanders/boardfarm_server_api.svg?branch=master)](https://travis-ci.org/mbanders/boardfarm_server_api)
 # boardfarm_server_api
 A REST API for checking out/in devices and seeing current status.
 
