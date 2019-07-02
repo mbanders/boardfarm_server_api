@@ -113,14 +113,17 @@ router.get('/bf_config', (req, res) => {
 
     // Add devices to their locations
     database.device.find(device_filter, projection).toArray((err, docs) => {
-      let names = []
+      let names = {}
       for (let i = 0; i < docs.length; i++) {
         let doc = docs[i]
-        // Only show at most 1 device of a given name
-        if (names.includes(doc.name)) {
+        // Only show at most 1 device of a given name (per location)
+        if (!(doc.location in names)) {
+          names[doc.location] = []
+        }
+        if (names[doc.location].includes(doc.name)) {
           continue
         }
-        names.push(doc.name)
+        names[doc.location].push(doc.name)
         final_config.locations[doc.location].devices.push(doc)
       }
     })
