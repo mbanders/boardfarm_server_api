@@ -6,6 +6,6 @@ RUN npm install
 
 # TODO: mongodb link?
 
-EXPOSE 80
+EXPOSE 5001
 
 CMD [ "node", "index.js" ]
