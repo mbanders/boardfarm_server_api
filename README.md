@@ -70,4 +70,4 @@ All paths begin with `/api`.
     docker build -t bft:server_api .
     docker run -e MONGO_USER=$bftuser \
         -e MONGO_PASS=$bftpass -e MONGO_SERVER=$mongodbserver \
-        -p 80:80 bft:server_api
+        -p 80:5001 bft:server_api
