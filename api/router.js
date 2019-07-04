@@ -126,26 +126,26 @@ router.get('/bf_config', (req, res) => {
         names[doc.location].push(doc.name)
         final_config.locations[doc.location].devices.push(doc)
       }
-    })
 
-    // Add stations
-    database.station.find(station_filter, projection).toArray((err, docs) => {
-      if (err) {
-        throw err
-      }
+      // Add stations
+      database.station.find(station_filter, projection).toArray((err, docs) => {
+        if (err) {
+          throw err
+        }
 
-      docs.forEach((doc) => {
-        let name = doc.name
-        delete doc.name
-        final_config[name] = doc
-      })
-      if (Object.keys(final_config.locations).length == 0) {
-        delete final_config.locations
-      }
-      // Send result
-      res.json(final_config)
-    })
-  })
+        docs.forEach((doc) => {
+          let name = doc.name
+          delete doc.name
+          final_config[name] = doc
+        })
+        if (Object.keys(final_config.locations).length == 0) {
+          delete final_config.locations
+        }
+        // Send result
+        res.json(final_config)
+      }) // end add stations
+    }) // end add devices
+  }) // end add locations
 })
 
 router.post('/checkout', (req, res) => {
