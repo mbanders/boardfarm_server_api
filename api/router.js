@@ -94,7 +94,13 @@ router.get('/bf_config', (req, res) => {
   const station_filter = { 'active_users': { $in: [null, 0] },
                            'available_for_autotests': true }
   const device_filter = { $expr: { $gt: ["$max_users", "$active_users"] } }
-  const projection = {'projection': {max_users: 0, active_users: 0, available_for_autotests: 0}}
+  // Fields to hide when returning boardfarm config
+  const projection = {'projection': {max_users: 0, active_users: 0,
+                                     available_for_autotests: 0,
+                                     active_host: 0, active_user: 0,
+                                     prev_host: 0, prev_user: 0,
+                                     total_uses: 0}
+                      }
   // Final config that will be returned
   var final_config = {}
   // Add locations
@@ -155,9 +161,21 @@ router.post('/checkout', (req, res) => {
   var filter = { 'name': req.body.name }
   var action = { $inc: { 'active_users': 1,
                          'total_uses': 1 },
-		             $set: { 'active_user': req.body.username,
+                 $set: { 'active_user': req.body.username,
                          'active_host': req.body.hostname }
-	             }
+               }
+  var device_ids = req.body.ids
+  if (device_ids.length > 1) {
+    // Checkout shared devices
+    let dev_filter = { _id: { $in: database.str_to_id(device_ids) } }
+    database.device.updateMany(dev_filter, action, {}, (err, res) => {
+      if (err) {
+        throw err
+      } else {
+        console.log('Checked out %s devices.', res.result.nModified)
+      }
+    })
+  }
   database.station.findOneAndUpdate(filter, action, {}, (err, doc) => {
     if (err) {
       res.json({ 'status': 'fail' })
@@ -177,7 +195,19 @@ router.post('/checkin', (req, res) => {
                          'active_host': '',
                          'prev_user': req.body.username,
                          'prev_host': req.body.hostname }
-	             }
+               }
+  var device_ids = req.body.ids
+  if (device_ids.length > 1) {
+    // Checkout shared devices
+    let dev_filter = { _id: { $in: database.str_to_id(device_ids) } }
+    database.device.updateMany(dev_filter, action, {}, (err, res) => {
+      if (err) {
+        throw err
+      } else {
+        console.log('Checked in %s devices.', res.result.nModified)
+      }
+    })
+  }
   database.station.findOneAndUpdate(filter, action, {}, (err, doc) => {
     if (err) {
       res.json({ 'status': 'fail' })

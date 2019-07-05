@@ -12,6 +12,11 @@ module.exports = {
   'location': null
 }
 
+// Convert an array of strings to mongo ObjectIDs
+module.exports.str_to_id = function(id_array) {
+  return id_array.map(x => mongodb.ObjectID(x))
+}
+
 client.connect(err => {
   if (err) {
     console.log(err)
