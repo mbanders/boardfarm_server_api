@@ -13,7 +13,7 @@ module.exports = {
 }
 
 // Convert an array of strings to mongo ObjectIDs
-module.exports.str_to_id = function(id_array) {
+module.exports.str_to_id = function (id_array) {
   return id_array.map(x => mongodb.ObjectID(x))
 }
 

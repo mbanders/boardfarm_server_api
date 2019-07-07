@@ -4,6 +4,8 @@
   "description": "A REST API for checking in/out devices and seeing status",
   "main": "index.js",
   "scripts": {
+    "lint": "eslint .",
+    "lint-fix": "eslint --fix .",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "repository": {

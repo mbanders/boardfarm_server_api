@@ -7,7 +7,7 @@ const api_version = require('../package.json').version
 
 router.get('/', (req, res) => {
   res.json({ message: 'Welcome to Boardfarm REST API',
-             version: api_version })
+    version: api_version })
 })
 
 router.get('/devices', (req, res) => {
@@ -53,7 +53,7 @@ router.post('/stations/:name', (req, res) => {
 })
 
 router.post('/bf_config', (req, res) => {
-  console.log("Received a new boardfarm config file from %s", req.connection.remoteAddress)
+  console.log('Received a new boardfarm config file from %s', req.connection.remoteAddress)
   bfconfigprocessor.process_config(req.body, (devices, locations, stations) => {
     database.device.drop()
     database.location.drop()
@@ -84,7 +84,7 @@ router.post('/bf_config', (req, res) => {
       }
       console.log('Inserted %s stations.', stations.length)
       var msg = `Successfully inserted ${devices.length} shared devices, ${locations.length} locations, ${stations.length} stations.`
-      res.json({'message': msg})
+      res.json({ 'message': msg })
     })
   })
 })
@@ -92,15 +92,18 @@ router.post('/bf_config', (req, res) => {
 router.get('/bf_config', (req, res) => {
   // Only return stations matching this filter
   const station_filter = { 'active_users': { $in: [null, 0] },
-                           'available_for_autotests': true }
-  const device_filter = { $expr: { $gt: ["$max_users", "$active_users"] } }
+    'available_for_autotests': true }
+  const device_filter = { $expr: { $gt: ['$max_users', '$active_users'] } }
   // Fields to hide when returning boardfarm config
-  const projection = {'projection': {max_users: 0, active_users: 0,
-                                     available_for_autotests: 0,
-                                     active_host: 0, active_user: 0,
-                                     prev_host: 0, prev_user: 0,
-                                     total_uses: 0}
-                      }
+  const projection = { 'projection': { max_users: 0,
+    active_users: 0,
+    available_for_autotests: 0,
+    active_host: 0,
+    active_user: 0,
+    prev_host: 0,
+    prev_user: 0,
+    total_uses: 0 }
+  }
   // Final config that will be returned
   var final_config = {}
   // Add locations
@@ -160,10 +163,10 @@ router.post('/checkout', (req, res) => {
   console.log(req.body)
   var filter = { 'name': req.body.name }
   var action = { $inc: { 'active_users': 1,
-                         'total_uses': 1 },
-                 $set: { 'active_user': req.body.username,
-                         'active_host': req.body.hostname }
-               }
+    'total_uses': 1 },
+  $set: { 'active_user': req.body.username,
+    'active_host': req.body.hostname }
+  }
   var device_ids = req.body.ids
   if (device_ids.length > 1) {
     // Checkout shared devices
@@ -191,11 +194,11 @@ router.post('/checkin', (req, res) => {
   console.log(req.body)
   var filter = { 'name': req.body.name }
   var action = { $inc: { 'active_users': -1 },
-                 $set: { 'active_user': '',
-                         'active_host': '',
-                         'prev_user': req.body.username,
-                         'prev_host': req.body.hostname }
-               }
+    $set: { 'active_user': '',
+      'active_host': '',
+      'prev_user': req.body.username,
+      'prev_host': req.body.hostname }
+  }
   var device_ids = req.body.ids
   if (device_ids.length > 1) {
     // Checkout shared devices
