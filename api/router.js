@@ -5,6 +5,27 @@ const database = require('./database')
 const bfconfigprocessor = require('./bfconfigprocessor')
 const api_version = require('../package.json').version
 
+// Use this cache function for any page that doesn't
+// need to query mongo every *single* time.
+const mcache = require('memory-cache');
+var cache = (duration) => {
+  return (req, res, next) => {
+    let key = '__express__' + req.originalUrl || req.url
+    let cachedBody = mcache.get(key)
+    if (cachedBody) {
+      res.send(cachedBody)
+      return
+    } else {
+      res.sendResponse = res.send
+      res.send = (body) => {
+        mcache.put(key, body, duration * 1000);
+        res.sendResponse(body)
+      }
+      next()
+    }
+  }
+}
+
 router.get('/', (req, res) => {
   res.json({ message: 'Welcome to Boardfarm REST API',
     version: api_version })
@@ -28,7 +49,10 @@ router.get('/locations/:name', (req, res) => {
   })
 })
 
-router.get('/stations', (req, res) => {
+// Front-end polls this to display. We don't need to update
+// rapidly, so caching this improves response time by
+// an order of magnitude.
+router.get('/stations', cache(1.5), (req, res) => {
   database.station.find({}).toArray((err, docs) => {
     res.json(docs)
   })
