@@ -32,10 +32,19 @@ function process_config (bf_config, callback) {
   entries = Object.entries(bf_config)
   for (const [key, val] of entries) {
     val.name = key
-    val.available_for_autotests = true
+    if (!('available_for_autotests' in val)) {
+      val.available_for_autotests = true
+    }
+    if (!('feature' in val)) {
+      val.feature = []
+    }
+    if (!('location' in val)) {
+      val.location = 'local'
+    }
     val.active_users = 0
     val.active_user = ''
     val.active_host = ''
+    val.note = ''
     val.prev_user = ''
     val.prev_host = ''
     val.total_uses = 0
