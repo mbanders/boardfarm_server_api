@@ -28,15 +28,22 @@ I recommend running with systemd. These instructions are for Ubuntu.
     ```sh
     sudo systemctl start bfapi
     ```
-1. Check the status to see if it is running:
-    ```sh
-    sudo journalctl -u bfapi
-    ```
-1. Enable it to automatically run on boot:
-    ```sh
-    sudo systemtl enable bfapi
-    ```
 1. You should be able to visit your web app at http://localhost:5001/api
+
+Extra commands:
+
+```sh
+# Check status
+sudo systemctl status bfapi
+# See log files
+sudo journalctl -u bfapi
+# Eanble to automatically run on boot:
+sudo systemtl enable bfapi
+# Stop the app
+sudo systemctl stop bfapi
+# Restart the app
+sudo systemctl restart bfapi
+```
 
 ## Setup with Docker
 
@@ -57,5 +64,7 @@ Another way to run this app is with docker. If you choose to use docker, here's 
     ```sh
     docker run -e MONGO_USER=$bftuser \
         -e MONGO_PASS=$bftpass -e MONGO_SERVER=$mongodbserver \
-        -p 80:5001 bft:server_api
+        -p 5001:5001 bft:server_api
     ```
+1. You should be able to visit your web app at http://localhost:5001/api
+
