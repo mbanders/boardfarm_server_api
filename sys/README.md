@@ -5,7 +5,7 @@ Systemd is an easy way to manage running this web application on a linux system.
 
 I recommend running with systemd. These instructions are for Ubuntu.
 
-1. Modify the file `bfapi.service` to contain your settings for your mongodb:
+1. Modify the file `sys/bfapi.service` to contain your settings for your mongodb:
     ```[Service]
     Environment="MONGO_USER=yourmongouser"
     Environment="MONGO_PASS=yourmongopass"
