@@ -2,7 +2,7 @@
 # boardfarm_server_api
 A REST API for checking out/in devices and seeing current status.
 
-## Quick Start
+## Quick Start for Developers
 
 Tested on Ubuntu 18.
 
@@ -48,6 +48,10 @@ Tested on Ubuntu 18.
 1. Visit `http://YourServer:Port/api/bf_config` to see the full boardfarm config file you just pushed. You will see some extra keys, that's ok.
 1. Also visit `http://YourServer:Port/api/stations` and `http://YourServer:port/api/devices` to see the stations and the shareable devices.
 
+## Run for Production
+
+See [production setup](sys/README.md).
+
 ## Rest API Desciription
 
 All paths begin with `/api`.
@@ -60,15 +64,3 @@ All paths begin with `/api`.
 | /stations/\<name\> | GET  | - | A JSON document describing the station with a given name |
 | /stations/\<name\> | POST | JSON containing fields and values to change |                                                                 
 | /locations | GET    | - | A JSON document describing all locations |
-
-### Running in docker container
-
-    docker run -d -e MONGO_INITDB_ROOT_USERNAME=$adminuser \
-        -e MONGO_INITDB_ROOT_PASSWORD=$adminpass -p 27017:27017 \
-        --name mongodb mongo:latest
-    docker exec -it mongodb mongo -u $adminuser -p $adminpass \
-         --eval "db.createUser({ user:'$bftuser', pwd:'$bftpass', roles:[ { role:'readWrite', db:'test' } ], mechanisms:[ 'SCRAM-SHA-1' ] })"
-    docker build -t bft:server_api .
-    docker run -e MONGO_USER=$bftuser \
-        -e MONGO_PASS=$bftpass -e MONGO_SERVER=$mongodbserver \
-        -p 80:5001 bft:server_api
