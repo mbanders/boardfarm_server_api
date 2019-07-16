@@ -119,14 +119,18 @@ router.get('/bf_config', (req, res) => {
     'available_for_autotests': true }
   const device_filter = { $expr: { $gt: ['$max_users', '$active_users'] } }
   // Fields to hide when returning boardfarm config
-  const projection = { 'projection': { max_users: 0,
-    active_users: 0,
-    available_for_autotests: 0,
-    active_host: 0,
-    active_user: 0,
-    prev_host: 0,
-    prev_user: 0,
-    total_uses: 0 }
+  const projection = { 'projection': {
+      active_users: 0,
+      active_host: 0,
+      active_url: 0,
+      active_user: 0,
+      available_for_autotests: 0,
+      max_users: 0,
+      prev_host: 0,
+      prev_user: 0,
+      prev_url: 0,
+      total_uses: 0
+    }
   }
   // Final config that will be returned
   var final_config = {}
