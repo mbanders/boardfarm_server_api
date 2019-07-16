@@ -1,0 +1,15 @@
+[Unit]
+Description=Boardfarm Server API
+After=network.target
+
+[Service]
+Environment="MONGO_USER=yourmongouser"
+Environment="MONGO_PASS=yourmongopass"
+Environment="MONGO_SERVER=localhost"
+Type=simple
+User=youruser
+ExecStart=/path/to/boardfarm_server_api/index.js
+Restart=on-failure
+
+[Install]
+WantedBy=multi-user.target
