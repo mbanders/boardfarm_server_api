@@ -26,6 +26,16 @@ var cache = (duration) => {
   }
 }
 
+// Use this Fisher-Yates shuffle function to reduce the chance
+// of different users trying to connect to the same device
+function shuffle(a) {
+  for (let i = a.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [a[i], a[j]] = [a[j], a[i]];
+  }
+  return a;
+}
+
 router.get('/', (req, res) => {
   res.json({ message: 'Welcome to Boardfarm REST API',
     version: api_version })
@@ -151,6 +161,7 @@ router.get('/bf_config', (req, res) => {
     // Add devices to their locations
     database.device.find(device_filter, projection).toArray((err, docs) => {
       let names = {}
+      shuffle(docs)
       for (let i = 0; i < docs.length; i++) {
         let doc = docs[i]
         // Only show at most 1 device of a given name (per location)
