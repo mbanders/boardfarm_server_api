@@ -38,7 +38,7 @@ sudo systemctl status bfapi
 # See log files
 sudo journalctl -u bfapi
 # Eanble to automatically run on boot:
-sudo systemtl enable bfapi
+sudo systemctl enable bfapi
 # Stop the app
 sudo systemctl stop bfapi
 # Restart the app
