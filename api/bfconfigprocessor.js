@@ -7,6 +7,11 @@ function process_config (bf_config, callback) {
   var locations_to_insert = []
   var stations_to_insert = []
 
+  // Drop unused keys
+  if ('_redirect' in bf_config) {
+    delete bf_config._redirect
+  }
+
   if ('locations' in bf_config) {
     var entries = Object.entries(bf_config.locations)
     for (const [key, val] of entries) {
