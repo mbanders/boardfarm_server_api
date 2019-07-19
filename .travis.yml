@@ -12,9 +12,13 @@ script:
         - ip a
         - docker run -d -e MONGO_INITDB_ROOT_USERNAME=$adminuser -e MONGO_INITDB_ROOT_PASSWORD=$adminpass -p 27017:27017 --name mongodb mongo:latest
         - sleep 60
-        - docker exec -it mongodb mongo -u $adminuser -p $adminpass --eval "db.createUser({ user:'$bftuser', pwd:'$bftpass', roles:[ { role:'readWrite', db:'test' } ], mechanisms:[ 'SCRAM-SHA-1' ] })"
+        - docker exec -it mongodb mongo -u $adminuser -p $adminpass --eval "db.createUser({ user:'$bftuser', pwd:'$bftpass', roles:[ { role:'readWrite', db:'boardfarm' } ], mechanisms:[ 'SCRAM-SHA-1' ] })"
         - docker build -t bft:server_api .
         - docker run -d -e MONGO_USER=$bftuser -e MONGO_PASS=$bftpass -e MONGO_SERVER=$mongodbserver -p 5001:5001 bft:server_api
         - sleep 60
         - curl http://localhost:5001/api
         - curl http://localhost:5001/api | grep "Welcome to Boardfarm"
+        - "curl -X POST -H 'Content-Type: application/json' -d @example.json http://localhost:5001/api/bf_config | grep Successful"
+        - curl http://localhost:5001/api/bf_config | grep "_id"
+          # no devices in example
+          # - curl http://localhost:5001/api/devices | grep "_id"
