@@ -55,7 +55,7 @@ Another way to run this app is with docker. If you choose to use docker, here's 
         -e MONGO_INITDB_ROOT_PASSWORD=$adminpass -p 27017:27017 \
         --name mongodb mongo:latest
     docker exec -it mongodb mongo -u $adminuser -p $adminpass \
-         --eval "db.createUser({ user:'$bftuser', pwd:'$bftpass', roles:[ { role:'readWrite', db:'test' } ] })"
+         --eval "db.createUser({ user:'$bftuser', pwd:'$bftpass', roles:[ { role:'readWrite', db:'boardfarm' } ] })"
 1. Build the docker container for this project:
     ```sh
     docker build -t bft:server_api .
