@@ -36,6 +36,25 @@ function shuffle(a) {
   return a;
 }
 
+
+// For devices with a waitlist, but no current user,
+// set the current user to the first person in waitlist.
+// Run periodically.
+function move_from_waitlist_to_current() {
+  console.log("Checking if we can move waitlist people to current users...")
+  var item_filter = { '_meta.current_user': null,
+                      $expr: { $gt: [ {$size: "$_meta.waitlist"}, 0] }
+                    }
+  database.device.find(item_filter).forEach( e => {
+    database.device.updateOne({_id: e._id}, {
+      $set: {'_meta.current_user': e._meta.waitlist[0]},
+      $pop: {'_meta.waitlist': -1} 
+    })
+  })
+}
+setInterval(move_from_waitlist_to_current, 30000)
+
+
 router.get('/', (req, res) => {
   res.json({ message: 'Welcome to Boardfarm REST API',
     version: api_version })
@@ -125,23 +144,10 @@ router.post('/bf_config', (req, res) => {
 
 router.get('/bf_config', (req, res) => {
   // Only return stations matching this filter
-  const station_filter = { 'active_users': { $in: [null, 0] },
-    'available_for_autotests': true }
-  const device_filter = { $expr: { $gt: ['$max_users', '$active_users'] } }
+  const station_filter = { '_meta.visible': true }
+  const device_filter = { '_meta.visible': true }
   // Fields to hide when returning boardfarm config
-  const projection = { 'projection': {
-      active_users: 0,
-      active_host: 0,
-      active_url: 0,
-      active_user: 0,
-      available_for_autotests: 0,
-      max_users: 0,
-      prev_host: 0,
-      prev_user: 0,
-      prev_url: 0,
-      total_uses: 0
-    }
-  }
+  const projection = { 'projection': { '_meta': 0} }
   // Final config that will be returned
   var final_config = {}
   // Add locations
@@ -194,6 +200,66 @@ router.get('/bf_config', (req, res) => {
       }) // end add stations
     }) // end add devices
   }) // end add locations
+})
+
+router.post('/add_to_waitlists', (req, res) => {
+  console.log('Request from %s for items:', req.connection.remoteAddress)
+  req.body.timestamp = new Date()
+  console.log(req.body)
+
+  var ids = req.body.item_ids
+  var _ids = database.str_to_id(req.body.item_ids)
+  var item_filter = { _id: { $in: _ids } }
+
+  var user_info = {
+    host: req.body.host,
+    id: req.body.user_id,
+    last_contact: req.body.timestamp,
+    user: req.body.user
+  }
+
+  var action = { $push: { '_meta.waitlist': user_info } }
+
+  database.device.updateMany(item_filter, action, {}, (err, res) => {
+    if (err) {
+      throw err
+    } else {
+      console.log('Added to waitlist for %s items.', res.result.nModified)
+    }
+  })
+
+  res.json({})
+})
+
+router.post('/ask_if_ready', (req, res) => {
+  console.log('Request from %s to see if all items are ready.', req.connection.remoteAddress)
+  req.body.timestamp = new Date()
+
+  res.json({})
+})
+
+router.post('/give_back', (req, res) => {
+  console.log('Request from %s to give back items:', req.connection.remoteAddress)
+  req.body.timestamp = new Date()
+  console.log(req.body)
+
+  var ids = req.body.item_ids
+  var _ids = database.str_to_id(req.body.item_ids)
+  var item_filter = { }
+
+  var action = { $pull: { '_meta.waitlist': {id: req.body.user_id} } }
+
+  // Remove from all waitlists
+  database.device.updateMany(item_filter, action, {}, (err, res) => {
+    if (err) {
+      throw err
+    } else {
+      console.log('Removed from %s waitlists.', res.result.nModified)
+    }
+  })
+  // Remove from all current users
+
+  res.json({})
 })
 
 router.post('/checkout', (req, res) => {
