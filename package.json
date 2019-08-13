@@ -1,6 +1,6 @@
 {
   "name": "boardfarm_server_api",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "description": "A REST API for checking in/out devices and seeing status",
   "main": "index.js",
   "scripts": {
