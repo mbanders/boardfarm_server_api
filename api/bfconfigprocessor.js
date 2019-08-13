@@ -48,9 +48,11 @@ function process_config (bf_config, callback) {
     }
     val.active_users = 0
     val.active_user = ''
+    val.active_time = null,
     val.active_host = ''
     val.note = ''
     val.prev_user = ''
+    val.prev_time = null,
     val.prev_host = ''
     val.total_uses = 0
     stations_to_insert.push(val)

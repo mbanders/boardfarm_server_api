@@ -36,6 +36,54 @@ function shuffle(a) {
   return a;
 }
 
+// Check-in things automatically when we haven't
+// heard from the user in a while.
+function auto_checkin() {
+  console.log("Seeing if we can checkin unused devices ...")
+  var now = new Date()
+  var two_minutes_ago = new Date(now.getTime() - 2*60000)
+  var item_filter = { 'active_time': { $lt: two_minutes_ago } }
+  // Checkin unused stations
+  database.station.find(item_filter).forEach( e => {
+    console.log("Removing " + e.active_user +  " from " + e._id)
+    database.station.updateOne({_id: e._id}, {
+      $inc: { 'total_uses': 1 },
+      $set: {
+        'prev_user': e.active_user,
+        'prev_host': e.prev_host,
+        'prev_url': e.prev_url,
+        'prev_time': e.active_time,
+        'active_users': 0,
+        'active_user': '',
+        'active_host': '',
+        'active_url': '',
+        'active_time': null
+      }
+    })
+  })
+  // Checkin unused devices
+  database.device.find(item_filter).forEach( e => {
+    console.log("Removing " + e.active_user +  " from " + e._id)
+    database.device.updateOne({_id: e._id}, {
+      $inc: { 'total_uses': 1 },
+      $set: {
+        'prev_user': e.active_user,
+        'prev_host': e.prev_host,
+        'prev_url': e.prev_url,
+        'prev_time': e.active_time,
+        'active_users': 0,
+        'active_user': '',
+        'active_host': '',
+        'active_url': '',
+        'active_time': null
+      }
+    })
+  })
+}
+// Check every minute
+// IMPORTANT: Un-comment the next line after boardfarm client has the polling enabled.
+//setInterval(auto_checkin, 60000)
+
 router.get('/', (req, res) => {
   res.json({ message: 'Welcome to Boardfarm REST API',
     version: api_version })
@@ -125,18 +173,20 @@ router.post('/bf_config', (req, res) => {
 
 router.get('/bf_config', (req, res) => {
   // Only return stations matching this filter
-  const station_filter = { 'active_users': { $in: [null, 0] },
+  const station_filter = { 'active_user': { $in: [null, ''] },
     'available_for_autotests': true }
   const device_filter = { $expr: { $gt: ['$max_users', '$active_users'] } }
   // Fields to hide when returning boardfarm config
   const projection = { 'projection': {
       active_users: 0,
       active_host: 0,
+      active_time: 0,
       active_url: 0,
       active_user: 0,
       available_for_autotests: 0,
       max_users: 0,
       prev_host: 0,
+      prev_time: 0,
       prev_user: 0,
       prev_url: 0,
       total_uses: 0
@@ -198,15 +248,16 @@ router.get('/bf_config', (req, res) => {
 
 router.post('/checkout', (req, res) => {
   console.log('Request from %s to checkout: %s', req.connection.remoteAddress, req.body.name)
-  req.body.timestamp = new Date().toISOString()
+  req.body.timestamp = new Date()
   console.log(req.body)
   var filter = { 'name': req.body.name }
-  var action = { $inc: { 'active_users': 1,
-    'total_uses': 1 },
-  $set: { 'active_user': req.body.username,
-    'active_host': req.body.hostname,
-    'active_url': req.body.build_url}
-  }
+  var action = { $set: { 'active_users': 1,
+                         'active_user': req.body.username,
+                         'active_host': req.body.hostname,
+                         'active_url': req.body.build_url,
+                         'active_time': req.body.timestamp
+                        }
+                }
   var device_ids = req.body.ids
   if (device_ids.length > 1) {
     // Checkout shared devices
@@ -230,17 +281,21 @@ router.post('/checkout', (req, res) => {
 
 router.post('/checkin', (req, res) => {
   console.log('Request from %s to checkin: %s', req.connection.remoteAddress, req.body.name)
-  req.body.timestamp = new Date().toISOString()
+  req.body.timestamp = new Date()
   console.log(req.body)
   var filter = { 'name': req.body.name }
-  var action = { $inc: { 'active_users': -1 },
-    $set: { 'active_user': '',
-      'active_host': '',
-      'active_url': '',
-      'prev_user': req.body.username,
-      'prev_host': req.body.hostname,
-      'prev_url': req.body.build_url}
-  }
+  var action = { $inc: { 'total_uses': 1 },
+                 $set: { 'active_users': 0,
+                         'active_user': '',
+                         'active_host': '',
+                         'active_url': '',
+                         'active_time': null,
+                         'prev_user': req.body.username,
+                         'prev_host': req.body.hostname,
+                         'prev_url': req.body.build_url,
+                         'prev_time': req.body.timestamp
+                        }
+                 }
   var device_ids = req.body.ids
   if (device_ids.length > 1) {
     // Checkout shared devices
