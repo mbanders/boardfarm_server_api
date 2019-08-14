@@ -82,7 +82,7 @@ function auto_checkin() {
 }
 // Check every minute
 // IMPORTANT: Un-comment the next line after boardfarm client has the polling enabled.
-//setInterval(auto_checkin, 60000)
+setInterval(auto_checkin, 60000)
 
 router.get('/', (req, res) => {
   res.json({ message: 'Welcome to Boardfarm REST API',
