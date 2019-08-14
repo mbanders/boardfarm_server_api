@@ -39,7 +39,6 @@ function shuffle(a) {
 // Check-in things automatically when we haven't
 // heard from the user in a while.
 function auto_checkin() {
-  console.log("Seeing if we can checkin unused devices ...")
   var now = new Date()
   var two_minutes_ago = new Date(now.getTime() - 2*60000)
   var item_filter = { 'active_time': { $lt: two_minutes_ago } }
