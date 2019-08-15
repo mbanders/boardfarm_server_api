@@ -15,6 +15,15 @@ app.use(function (req, res, next) {
   next()
 })
 
+// Require all POST requests have a certain content-type
+app.post('*', (req, res, next) => {
+  if (!req.is('application/json')) {
+    res.json({ 'message': "ERROR: You must POST with 'Content-Type: application/json'" })
+    return
+  }
+  next();
+})
+
 var router = require('./api/router')
 
 // Start all router paths with /api
