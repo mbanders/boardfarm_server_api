@@ -1,6 +1,7 @@
 #!/usr/bin/env node
 const config = require('./config')
 
+const compareVersions = require('compare-versions')
 const express = require('express')
 const app = express()
 const bodyParser = require('body-parser')
@@ -22,6 +23,30 @@ app.post('*', (req, res, next) => {
     return
   }
   next();
+})
+
+// Check user-agent
+app.use(function (req, res, next) {
+  var user = req.get('user-agent')
+  console.log(user)
+  // The following few lines will halt really old versions of boardfarm.
+  // The message they'll actually see is
+  //     HTTP Error 400: Bad Request
+  //     Unable to access/read Board Farm configuration
+  /*if (user && user.startsWith('Python-urllib')) {
+    res.status(400)
+    res.json({'message': 'Your version of boardfarm is outdated and should not be used against this server. Please update.'})
+    return
+  }*/
+  if (user && user.startsWith('Boardfarm')) {
+    bf_ver = user.split(';')[0].split(' ')[1]
+    if (compareVersions(bf_ver, config.min_boardfarm_client_version) < 0) {
+      res.status(400)
+      res.json({'message': 'Your version of boardfarm is outdated and should not be used against this server. Please update.'})
+      return
+    }
+  }
+  next()
 })
 
 var router = require('./api/router')

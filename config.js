@@ -1,5 +1,6 @@
 module.exports = {
-  'port': 5001
+  'port': 5001,
+  'min_boardfarm_client_version': '1.1.0'
 }
 
 // For connecting to MongoDB
