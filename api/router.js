@@ -181,7 +181,6 @@ router.get('/bf_config', (req, res) => {
       active_time: 0,
       active_url: 0,
       active_user: 0,
-      available_for_autotests: 0,
       max_users: 0,
       prev_host: 0,
       prev_time: 0,
