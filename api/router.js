@@ -172,8 +172,7 @@ router.post('/bf_config', (req, res) => {
 
 router.get('/bf_config', (req, res) => {
   // Only return stations matching this filter
-  const station_filter = { 'active_user': { $in: [null, ''] },
-    'available_for_autotests': true }
+  const station_filter = { 'active_user': { $in: [null, ''] } }
   const device_filter = { $expr: { $gt: ['$max_users', '$active_users'] } }
   // Fields to hide when returning boardfarm config
   const projection = { 'projection': {
