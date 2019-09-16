@@ -171,6 +171,7 @@ router.post('/bf_config', (req, res) => {
 })
 
 router.get('/bf_config', (req, res) => {
+  console.log("GET /bf_config")
   // Only return stations matching this filter
   const station_filter = { 'active_user': { $in: [null, ''] } }
   const device_filter = { $expr: { $gt: ['$max_users', '$active_users'] } }
@@ -193,7 +194,12 @@ router.get('/bf_config', (req, res) => {
   var final_config = {}
   // Add locations
   database.location.find({}, projection).toArray((err, docs) => {
+    if (docs.length == 0) {
+      console.log(`WARNING: ${docs.length} locations returned by mongodb.`)
+    }
+
     if (err) {
+      console.log(err)
       throw err
     }
 
@@ -207,6 +213,14 @@ router.get('/bf_config', (req, res) => {
 
     // Add devices to their locations
     database.device.find(device_filter, projection).toArray((err, docs) => {
+      if (docs.length == 0) {
+        console.log(`WARNING: ${docs.length} devices returned by mongodb.`)
+      }
+      if (err) {
+        console.log(err)
+        throw err
+      }
+
       let names = {}
       shuffle(docs)
       for (let i = 0; i < docs.length; i++) {
@@ -224,7 +238,12 @@ router.get('/bf_config', (req, res) => {
 
       // Add stations
       database.station.find(station_filter, projection).toArray((err, docs) => {
+        if (docs.length == 0) {
+          console.log(`WARNING: ${docs.length} stations returned by mongodb.`)
+        }
+
         if (err) {
+          console.log(err)
           throw err
         }
 
