@@ -28,7 +28,6 @@ app.post('*', (req, res, next) => {
 // Check user-agent
 app.use(function (req, res, next) {
   var user = req.get('user-agent')
-  console.log(user)
   // The following few lines will halt really old versions of boardfarm.
   // The message they'll actually see is
   //     HTTP Error 400: Bad Request
@@ -39,8 +38,10 @@ app.use(function (req, res, next) {
     return
   }*/
   if (user && user.startsWith('Boardfarm')) {
+    console.log(user)
     bf_ver = user.split(';')[0].split(' ')[1]
     if (compareVersions(bf_ver, config.min_boardfarm_client_version) < 0) {
+      console.log("Boardfarm client version is too old, access denied.")
       res.status(400)
       res.json({'message': 'Your version of boardfarm is outdated and should not be used against this server. Please update.'})
       return
