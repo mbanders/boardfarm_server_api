@@ -143,29 +143,23 @@ router.post('/bf_config', (req, res) => {
     console.log(' * %s devices', devices.length)
     console.log(' * %s locations', locations.length)
     console.log(' * %s stations', stations.length)
-    if (devices.length > 0) {
-      database.device.insertMany(devices, (err, result) => {
-        if (err) {
-          throw err
-        }
-        console.log('Inserted %s devices.', devices.length)
-      })
-    }
-    if (locations.length > 0) {
+    database.device.insertMany(devices, (err, result) => {
+      if (err) {
+        throw err
+      }
       database.location.insertMany(locations, (err, result) => {
         if (err) {
           throw err
         }
-        console.log('Inserted %s locations.', locations.length)
+        database.station.insertMany(stations, (err, result) => {
+          if (err) {
+            throw err
+          }
+          let msg = `Successfully inserted ${devices.length} shared devices, ${locations.length} locations, ${stations.length} stations.`
+          console.log(msg)
+          res.json({ 'message': msg })
+        })
       })
-    }
-    database.station.insertMany(stations, (err, result) => {
-      if (err) {
-        throw err
-      }
-      console.log('Inserted %s stations.', stations.length)
-      var msg = `Successfully inserted ${devices.length} shared devices, ${locations.length} locations, ${stations.length} stations.`
-      res.json({ 'message': msg })
     })
   })
 })
