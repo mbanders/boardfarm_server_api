@@ -134,30 +134,35 @@ router.post('/stations/:name', (req, res) => {
 })
 
 router.post('/bf_config', (req, res) => {
-  console.log('Received a new boardfarm config file from %s', req.connection.remoteAddress)
+  console.log('POST /bf_config from %s', req.connection.remoteAddress)
   bfconfigprocessor.process_config(req.body, (devices, locations, stations) => {
-    database.device.drop()
-    database.location.drop()
-    database.station.drop()
-    console.log('Will insert into mongodb:')
-    console.log(' * %s devices', devices.length)
-    console.log(' * %s locations', locations.length)
-    console.log(' * %s stations', stations.length)
-    database.device.insertMany(devices, (err, result) => {
-      if (err) {
-        throw err
-      }
-      database.location.insertMany(locations, (err, result) => {
-        if (err) {
-          throw err
-        }
-        database.station.insertMany(stations, (err, result) => {
-          if (err) {
-            throw err
-          }
-          let msg = `Successfully inserted ${devices.length} shared devices, ${locations.length} locations, ${stations.length} stations.`
-          console.log(msg)
-          res.json({ 'message': msg })
+    // Remove existing collections
+    database.device.drop((err, result) => {
+      database.location.drop((err, result) => {
+        database.station.drop((err, result) => {
+          console.log('Dropped existing data.')
+          console.log('Next, insert into mongodb:')
+          console.log(' * %s devices', devices.length)
+          console.log(' * %s locations', locations.length)
+          console.log(' * %s stations', stations.length)
+          database.device.insertMany(devices, (err, result) => {
+            if (err) {
+              throw err
+            }
+            database.location.insertMany(locations, (err, result) => {
+              if (err) {
+                throw err
+              }
+              database.station.insertMany(stations, (err, result) => {
+                if (err) {
+                  throw err
+                }
+                let msg = `Successfully inserted ${devices.length} shared devices, ${locations.length} locations, ${stations.length} stations.`
+                console.log(msg)
+                res.json({ 'message': msg })
+              })
+            })
+          })
         })
       })
     })
