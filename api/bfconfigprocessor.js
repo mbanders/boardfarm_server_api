@@ -1,7 +1,28 @@
 
 // curl -X POST -H "Content-Type: application/json" -d @config.json http://localhost:5001/api/bf_config
 
-function process_config (bf_config, callback) {
+
+// For simple, shallow copies of objects
+var extend = require('util')._extend
+
+// To order keys of an object
+function sorted(obj) {
+  const ordered = {}
+  Object.keys(obj).sort().forEach(function(key) {
+    ordered[key] = obj[key];
+  })
+  return ordered
+}
+
+// Data that boardfarm client doesn't need to know, but
+// is useful for our server.
+const station_meta_data = {
+  available_for_autotests: true,
+  note: null,
+  total_uses: 0
+}
+
+function process_config (bf_config, saved_station_data, callback) {
   // Array of documents we will insert
   var devices_to_insert = []
   var locations_to_insert = []
@@ -29,7 +50,7 @@ function process_config (bf_config, callback) {
         delete val.devices
       }
       val.name = key
-      locations_to_insert.push(val)
+      locations_to_insert.push(sorted(val))
     }
     delete bf_config.locations
   }
@@ -37,8 +58,15 @@ function process_config (bf_config, callback) {
   entries = Object.entries(bf_config)
   for (const [key, val] of entries) {
     val.name = key
+    if (key in saved_station_data) {
+      val._meta = extend({}, saved_station_data[key]['_meta'])
+    } else {
+      val._meta = extend({}, station_meta_data)
+    }
     if (!('available_for_autotests' in val)) {
       val.available_for_autotests = true
+    } else {
+      val._meta.available_for_autotests = val.available_for_autotests
     }
     if (!('feature' in val)) {
       val.feature = []
@@ -55,7 +83,7 @@ function process_config (bf_config, callback) {
     val.prev_time = null,
     val.prev_host = ''
     val.total_uses = 0
-    stations_to_insert.push(val)
+    stations_to_insert.push(sorted(val))
   }
 
   callback(devices_to_insert, locations_to_insert, stations_to_insert)

@@ -46,7 +46,8 @@ function auto_checkin() {
   database.station.find(item_filter).forEach( e => {
     console.log("Removing " + e.active_user +  " from " + e._id)
     database.station.updateOne({_id: e._id}, {
-      $inc: { 'total_uses': 1 },
+      $inc: { 'total_uses': 1,
+              '_meta.total_uses': 1 },
       $set: {
         'prev_user': e.active_user,
         'prev_host': e.prev_host,
@@ -135,38 +136,48 @@ router.post('/stations/:name', (req, res) => {
 
 router.post('/bf_config', (req, res) => {
   console.log('POST /bf_config from %s', req.connection.remoteAddress)
-  bfconfigprocessor.process_config(req.body, (devices, locations, stations) => {
-    // Remove existing collections
-    database.device.drop((err, result) => {
-      database.location.drop((err, result) => {
-        database.station.drop((err, result) => {
-          console.log('Dropped existing data.')
-          console.log('Next, insert into mongodb:')
-          console.log(' * %s devices', devices.length)
-          console.log(' * %s locations', locations.length)
-          console.log(' * %s stations', stations.length)
-          database.device.insertMany(devices, (err, result) => {
-            if (devices.length > 0 && err) {
-              console.log(err)
-            }
-            database.location.insertMany(locations, (err, result) => {
-              if (locations.length > 0 && err) {
+
+  // Get all stations to save some data first
+  database.station.find({}).toArray((err, cur_stations) => {
+    saved_station_data = {}
+    cur_stations.forEach((item, index) => {
+      saved_station_data[item.name] = {_meta: item._meta}
+    })
+    bfconfigprocessor.process_config(req.body,
+                                     saved_station_data,
+                                     (devices, locations, stations) => {
+      // Remove existing collections
+      database.device.drop((err, result) => {
+        database.location.drop((err, result) => {
+          database.station.drop((err, result) => {
+            console.log('Dropped existing data.')
+            console.log('Next, insert into mongodb:')
+            console.log(' * %s devices', devices.length)
+            console.log(' * %s locations', locations.length)
+            console.log(' * %s stations', stations.length)
+            database.device.insertMany(devices, (err, result) => {
+              if (devices.length > 0 && err) {
                 console.log(err)
               }
-              database.station.insertMany(stations, (err, result) => {
-                if (stations.length > 0 && err) {
+              database.location.insertMany(locations, (err, result) => {
+                if (locations.length > 0 && err) {
                   console.log(err)
                 }
-                let msg = `Successfully inserted ${devices.length} shared devices, ${locations.length} locations, ${stations.length} stations.`
-                console.log(msg)
-                res.json({ 'message': msg })
-              })
-            })
+                database.station.insertMany(stations, (err, result) => {
+                  if (stations.length > 0 && err) {
+                    console.log(err)
+                  }
+                  let msg = `Successfully inserted ${devices.length} shared devices, ${locations.length} locations, ${stations.length} stations.`
+                  console.log(msg)
+                  res.json({ 'message': msg })
+                }) // END insert stations
+              }) // END insert locations
+            }) // END insert devices
           })
         })
       })
     })
-  })
+  }) // END Station data saving
 })
 
 router.get('/bf_config', (req, res) => {
@@ -176,6 +187,7 @@ router.get('/bf_config', (req, res) => {
   const device_filter = { $expr: { $gt: ['$max_users', '$active_users'] } }
   // Fields to hide when returning boardfarm config
   const projection = { 'projection': {
+      _meta: 0,
       active_users: 0,
       active_host: 0,
       active_time: 0,
@@ -299,7 +311,8 @@ router.post('/checkin', (req, res) => {
   req.body.timestamp = new Date()
   console.log(req.body)
   var filter = { 'name': req.body.name }
-  var action = { $inc: { 'total_uses': 1 },
+  var action = { $inc: { 'total_uses': 1,
+                         '_meta.total_uses': 1 },
                  $set: { 'active_users': 0,
                          'active_user': '',
                          'active_host': '',
