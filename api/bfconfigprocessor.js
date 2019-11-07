@@ -18,7 +18,7 @@ function sorted(obj) {
 // is useful for our server.
 const station_meta_data = {
   available_for_autotests: true,
-  note: null,
+  note: '',
   total_uses: 0
 }
 
@@ -63,10 +63,9 @@ function process_config (bf_config, saved_station_data, callback) {
     } else {
       val._meta = extend({}, station_meta_data)
     }
-    if (!('available_for_autotests' in val)) {
-      val.available_for_autotests = true
-    } else {
+    if ('available_for_autotests' in val) {
       val._meta.available_for_autotests = val.available_for_autotests
+      delete val.available_for_autotests
     }
     if (!('feature' in val)) {
       val.feature = []
@@ -76,13 +75,11 @@ function process_config (bf_config, saved_station_data, callback) {
     }
     val.active_users = 0
     val.active_user = ''
-    val.active_time = null,
+    val.active_time = null
     val.active_host = ''
-    val.note = ''
     val.prev_user = ''
-    val.prev_time = null,
+    val.prev_time = null
     val.prev_host = ''
-    val.total_uses = 0
     stations_to_insert.push(sorted(val))
   }
 

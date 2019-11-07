@@ -46,8 +46,7 @@ function auto_checkin() {
   database.station.find(item_filter).forEach( e => {
     console.log("Removing " + e.active_user +  " from " + e._id)
     database.station.updateOne({_id: e._id}, {
-      $inc: { 'total_uses': 1,
-              '_meta.total_uses': 1 },
+      $inc: { '_meta.total_uses': 1 },
       $set: {
         'prev_user': e.active_user,
         'prev_host': e.prev_host,
@@ -183,7 +182,8 @@ router.post('/bf_config', (req, res) => {
 router.get('/bf_config', (req, res) => {
   console.log("GET /bf_config")
   // Only return stations matching this filter
-  const station_filter = { 'active_user': { $in: [null, ''] } }
+  const station_filter = { 'active_user': { $in: [null, ''] },
+                           '_meta.available_for_autotests': true }
   const device_filter = { $expr: { $gt: ['$max_users', '$active_users'] } }
   // Fields to hide when returning boardfarm config
   const projection = { 'projection': {
@@ -311,8 +311,7 @@ router.post('/checkin', (req, res) => {
   req.body.timestamp = new Date()
   console.log(req.body)
   var filter = { 'name': req.body.name }
-  var action = { $inc: { 'total_uses': 1,
-                         '_meta.total_uses': 1 },
+  var action = { $inc: { '_meta.total_uses': 1 },
                  $set: { 'active_users': 0,
                          'active_user': '',
                          'active_host': '',
