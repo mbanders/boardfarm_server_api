@@ -56,7 +56,8 @@ function auto_checkin() {
         'active_user': '',
         'active_host': '',
         'active_url': '',
-        'active_time': null
+        'active_time': null,
+        'active_timestart': null
       }
     })
   })
@@ -74,7 +75,8 @@ function auto_checkin() {
         'active_user': '',
         'active_host': '',
         'active_url': '',
-        'active_time': null
+        'active_time': null,
+        'active_timestart': null
       }
     })
   })
@@ -191,6 +193,7 @@ router.get('/bf_config', (req, res) => {
       active_users: 0,
       active_host: 0,
       active_time: 0,
+      active_timestart: 0,
       active_url: 0,
       active_user: 0,
       max_users: 0,
@@ -297,12 +300,20 @@ router.post('/checkout', (req, res) => {
       }
     })
   }
-  database.station.findOneAndUpdate(filter, action, {}, (err, doc) => {
+  database.station.findOne(filter, (err, doc) => {
     if (err) {
       res.json({ 'status': 'fail' })
-    } else {
-      res.json(doc)
     }
+    if (!('active_timestart' in doc) || doc.active_timestart == null) {
+      action.$set.active_timestart = req.body.timestamp
+    }
+    database.station.updateOne(filter, action, {}, (err, result) => {
+      if (err) {
+        res.json({ 'status': 'fail' })
+      } else {
+        res.json({ message: 'Checked out '+ doc.name })
+      }
+    })
   })
 })
 
@@ -317,6 +328,7 @@ router.post('/checkin', (req, res) => {
                          'active_host': '',
                          'active_url': '',
                          'active_time': null,
+                         'active_timestart': null,
                          'prev_user': req.body.username,
                          'prev_host': req.body.hostname,
                          'prev_url': req.body.build_url,
