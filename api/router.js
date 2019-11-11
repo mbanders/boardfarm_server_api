@@ -48,6 +48,7 @@ function auto_checkin() {
     database.station.updateOne({_id: e._id}, {
       $inc: { '_meta.total_uses': 1 },
       $set: {
+        '_meta.active_msg': '',
         'prev_user': e.active_user,
         'prev_host': e.prev_host,
         'prev_url': e.prev_url,
@@ -65,7 +66,7 @@ function auto_checkin() {
   database.device.find(item_filter).forEach( e => {
     console.log("Removing " + e.active_user +  " from " + e._id)
     database.device.updateOne({_id: e._id}, {
-      $inc: { 'total_uses': 1 },
+      $inc: { '_meta.total_uses': 1, 'total_uses': 1 },
       $set: {
         'prev_user': e.active_user,
         'prev_host': e.prev_host,
@@ -323,7 +324,8 @@ router.post('/checkin', (req, res) => {
   console.log(req.body)
   var filter = { 'name': req.body.name }
   var action = { $inc: { '_meta.total_uses': 1 },
-                 $set: { 'active_users': 0,
+                 $set: { '_meta.active_msg': '',
+                         'active_users': 0,
                          'active_user': '',
                          'active_host': '',
                          'active_url': '',
