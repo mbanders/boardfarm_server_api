@@ -1,6 +1,30 @@
 # Production Setup
 Systemd is an easy way to manage running this web application on a linux system. Another option is running with docker, for those who prefer it.
 
+## Quick setup of MongoDb
+
+It's better to follow other, updated instructions, but if you just need to do it quickly:
+
+1. Install mongo:
+    ```sh
+    sudo apt update
+    sudo apt install -y mongodb
+    ```
+1. Check mongo status. This should show running and you can connect and see the mongo version:
+    ```sh
+    sudo systemctl status mongodb
+    mongo --eval 'db.runCommand({ connectionStatus: 1 })'
+    ```
+1. Create a user:
+    ```sh
+    # Connect to your mongo database
+    mongo
+    # Create user
+    db.createUser({ user:'someuser', pwd:'somepassword', roles:[ { role:'readWrite', db:'boardfarm' } ] })
+    ```
+
+That's it, press CTRL-D to exit.
+
 ## Setup with Systemd
 
 I recommend running with systemd. These instructions are for Ubuntu.
