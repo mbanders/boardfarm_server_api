@@ -21,7 +21,7 @@
   "dependencies": {
     "body-parser": "^1.19.0",
     "compare-versions": "^3.5.1",
-    "express": "^4.17.1",
+    "express": "^4.17.3",
     "memory-cache": "^0.2.0",
     "mongodb": "^3.2.7"
   },
